@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>অ্যাডমিন – সফটওয়্যার স্টোর</title>
+<style>
+:root{--ink:#10302a;--soft:#4b625c;--paper:#f4f7f5;--line:#dbe5e0;--action:#0b57d0;--action-d:#0842a0;--danger:#b4232a;--ok:#1d6b3a}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Hind Siliguri','Noto Sans Bengali','Kalpurush','Nikosh',system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.5}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0}
+:focus-visible{outline:3px solid var(--action);outline-offset:2px}
+.wrap{max-width:640px;margin:0 auto;padding:16px 16px 80px}
+header.top{display:flex;align-items:center;gap:12px;padding:6px 0 14px}
+header.top h1{flex:1;font-size:22px}
+.link{color:var(--action);font-weight:600;text-decoration:none;background:none;font-size:15px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:18px}
+.card h2{font-size:18px;margin-bottom:14px}
+label{display:block;font-weight:600;font-size:15px;margin:14px 0 6px}
+label small{font-weight:400;color:var(--soft)}
+input[type=text],input[type=email],input[type=password],input[type=number],textarea{
+  width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:#fff}
+textarea{min-height:96px;resize:vertical}
+input[type=file]{width:100%;padding:10px;border:1.5px dashed #9bb3ab;border-radius:10px;background:#f8fbf9}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{padding:13px 18px;border-radius:999px;background:var(--action);color:#fff;font-weight:600;font-size:16px;width:100%;margin-top:20px}
+.btn:hover{background:var(--action-d)}
+.btn[disabled]{opacity:.6;cursor:default}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line);margin-top:10px}
+.prev{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.pv{position:relative}
+.pv img{display:block;border-radius:12px;border:1px solid var(--line);object-fit:cover;background:#fff}
+.pv.ic img{width:84px;height:84px;border-radius:20px}
+.pv.sh img{height:140px;width:auto}
+.pv .x{position:absolute;top:-8px;right:-8px;width:26px;height:26px;border-radius:50%;background:var(--danger);color:#fff;font-size:16px;line-height:1}
+.status{margin-top:14px;padding:12px 14px;border-radius:10px;font-size:15px;display:none}
+.status.on{display:block}
+.status.info{background:#e8f0fe;color:#0842a0}
+.status.err{background:#fde8e8;color:var(--danger)}
+.status.ok{background:#e6f4ea;color:var(--ok)}
+.or{text-align:center;color:var(--soft);font-size:14px;margin:10px 0 0}
+.chk{display:flex;gap:10px;align-items:center;font-weight:600;margin-top:16px}
+.chk input{width:20px;height:20px}
+.item{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.item img,.item .ph{width:52px;height:52px;border-radius:13px;object-fit:cover;flex:none;background:#e3ece8}
+.item .t{font-weight:600}
+.item .m{font-size:13px;color:var(--soft)}
+.item .grow{flex:1;min-width:0}
+.item .acts{display:flex;gap:6px}
+.sm{padding:7px 12px;border-radius:999px;background:#eef3f0;font-size:14px;font-weight:600}
+.sm.del{background:#fde8e8;color:var(--danger)}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>অ্যাডমিন প্যানেল</h1>
+    <a class="link" href="index.html">স্টোর দেখুন</a>
+    <button class="link" id="logout" hidden>লগআউট</button>
+  </header>
+
+  <!-- লগইন -->
+  <section class="card" id="loginBox">
+    <h2>লগইন করুন</h2>
+    <form id="loginForm">
+      <label for="em">ইমেইল</label>
+      <input type="email" id="em" autocomplete="username" required>
+      <label for="pw">পাসওয়ার্ড</label>
+      <input type="password" id="pw" autocomplete="current-password" required>
+      <button class="btn" type="submit">লগইন</button>
+      <div class="status" id="loginStatus" role="alert"></div>
+    </form>
+  </section>
+
+  <!-- অ্যাপ যোগ / এডিট -->
+  <div id="panel" class="hide">
+    <section class="card">
+      <h2 id="formTitle">নতুন অ্যাপ যোগ করুন</h2>
+      <form id="appForm">
+        <label for="name">অ্যাপের নাম *</label>
+        <input type="text" id="name" required>
+
+        <div class="two">
+          <div>
+            <label for="dev">ডেভেলপার / কোম্পানি</label>
+            <input type="text" id="dev">
+          </div>
+          <div>
+            <label for="cat">ক্যাটাগরি</label>
+            <input type="text" id="cat" list="cats" placeholder="যেমন: বিজনেস">
+            <datalist id="cats"></datalist>
+          </div>
+        </div>
+
+        <div class="two">
+          <div>
+            <label for="ver">ভার্সন</label>
+            <input type="text" id="ver" placeholder="1.0.0">
+          </div>
+          <div>
+            <label for="rat">রেটিং <small>(১–৫)</small></label>
+            <input type="number" id="rat" min="1" max="5" step="0.1" value="4.5">
+          </div>
+        </div>
+
+        <label for="desc">বিবরণ</label>
+        <textarea id="desc"></textarea>
+
+        <label for="icon">অ্যাপের লোগো / আইকন <small>(বর্গাকার ছবি ভালো)</small></label>
+        <input type="file" id="icon" accept="image/*">
+        <div class="prev" id="iconPrev"></div>
+
+        <label for="shots">স্ক্রিনশট <small>(একসাথে অনেকগুলো বাছাই করতে পারবেন)</small></label>
+        <input type="file" id="shots" accept="image/*" multiple>
+        <div class="prev" id="shotPrev"></div>
+
+        <label for="file">সফটওয়্যার ফাইল (APK / ZIP / EXE) <small>(সর্বোচ্চ ৫০ MB)</small></label>
+        <input type="file" id="file">
+        <p class="or">অথবা বড় ফাইলের জন্য ডাউনলোড লিংক দিন</p>
+        <input type="text" id="link" placeholder="Google Drive শেয়ার লিংক পেস্ট করুন">
+        <p class="or" style="text-align:left">Drive-এ ফাইলের Share সেটিংস অবশ্যই "Anyone with the link" রাখুন। সাধারণ শেয়ার লিংক দিলেই চলবে, স্টোর নিজে সরাসরি ডাউনলোড লিংক বানিয়ে নেবে।</p>
+        <label for="size">ফাইলের সাইজ <small>(লিংক দিলে নিজে লিখুন, যেমন 85 MB। ফাইল আপলোড করলে নিজে বসে যাবে)</small></label>
+        <input type="text" id="size" placeholder="25 MB">
+
+        <label class="chk"><input type="checkbox" id="pub" checked> স্টোরে দেখান</label>
+
+        <button class="btn" type="submit" id="save">প্রকাশ করুন</button>
+        <button class="btn ghost hide" type="button" id="cancel">এডিট বাতিল করুন</button>
+        <div class="status" id="status" role="status" aria-live="polite"></div>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>আপলোড করা অ্যাপ</h2>
+      <div id="list"><p style="color:var(--soft)">লোড হচ্ছে…</p></div>
+    </section>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+if(SUPABASE_URL.includes("YOUR-PROJECT")){
+  document.body.innerHTML='<div class="wrap"><div class="card"><h2>সেটআপ বাকি আছে</h2><p>config.js ফাইলে Supabase URL ও Key বসান। README.txt দেখুন।</p></div></div>';
+  throw new Error("config missing");
+}
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let editing = null;          // এডিট করা অ্যাপ
+let keptShots = [];          // আগের স্ক্রিনশট (যেগুলো রাখা হবে)
+let removedShots = [];       // আগের স্ক্রিনশট (যেগুলো মুছবে)
+let newShots = [];           // নতুন বাছাই করা {file,url}
+let newIcon = null;          // নতুন আইকন {file,url}
+
+function showStatus(el,type,msg){ el.className="status on "+type; el.textContent=msg; }
+function hideStatus(el){ el.className="status"; }
+
+/* ---------- লগইন ---------- */
+async function init(){
+  const {data:{session}} = await sb.auth.getSession();
+  session ? enter() : leave();
+}
+function enter(){ $("#loginBox").classList.add("hide"); $("#panel").classList.remove("hide"); $("#logout").hidden=false; loadList(); }
+function leave(){ $("#loginBox").classList.remove("hide"); $("#panel").classList.add("hide"); $("#logout").hidden=true; }
+$("#loginForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const st=$("#loginStatus"); showStatus(st,"info","লগইন হচ্ছে…");
+  const {error}=await sb.auth.signInWithPassword({email:$("#em").value.trim(),password:$("#pw").value});
+  if(error){ showStatus(st,"err","ইমেইল বা পাসওয়ার্ড ঠিক নয়।"); return; }
+  hideStatus(st); enter();
+});
+$("#logout").addEventListener("click",async()=>{ await sb.auth.signOut(); leave(); });
+
+/* ---------- ছবি প্রসেস (ছোট করে আপলোড, তাই দ্রুত লোড হয়) ---------- */
+function processImage(file,{max,square,mime,q}){
+  return new Promise((res,rej)=>{
+    const img=new Image(), u=URL.createObjectURL(file);
+    img.onload=()=>{
+      let sx=0,sy=0,sw=img.width,sh=img.height,w,h;
+      if(square){ const s=Math.min(sw,sh); sx=(sw-s)/2; sy=(sh-s)/2; sw=sh=s; w=h=Math.min(max,s); }
+      else { const k=Math.min(1,max/Math.max(sw,sh)); w=Math.round(sw*k); h=Math.round(sh*k); }
+      const c=document.createElement("canvas"); c.width=w; c.height=h;
+      const x=c.getContext("2d");
+      if(mime==="image/jpeg"){ x.fillStyle="#fff"; x.fillRect(0,0,w,h); }
+      x.drawImage(img,sx,sy,sw,sh,0,0,w,h);
+      c.toBlob(b=>{ URL.revokeObjectURL(u); b?res(b):rej(new Error("ছবি প্রসেস করা যায়নি")); },mime,q);
+    };
+    img.onerror=()=>rej(new Error("ছবিটি পড়া যায়নি"));
+    img.src=u;
+  });
+}
+
+/* ---------- প্রিভিউ ---------- */
+function renderPreviews(){
+  $("#iconPrev").innerHTML = (newIcon||(editing&&editing.icon_url)) ?
+    `<div class="pv ic"><img src="${newIcon?newIcon.url:esc(editing.icon_url)}" alt="আইকন"></div>` : "";
+  const parts=[];
+  keptShots.forEach((u,i)=>parts.push(`<div class="pv sh"><img src="${esc(u)}" alt=""><button type="button" class="x" data-k="${i}" aria-label="সরান">×</button></div>`));
+  newShots.forEach((s,i)=>parts.push(`<div class="pv sh"><img src="${s.url}" alt=""><button type="button" class="x" data-n="${i}" aria-label="সরান">×</button></div>`));
+  $("#shotPrev").innerHTML=parts.join("");
+}
+$("#icon").addEventListener("change",e=>{
+  const f=e.target.files[0]; newIcon=f?{file:f,url:URL.createObjectURL(f)}:null; renderPreviews();
+});
+$("#shots").addEventListener("change",e=>{
+  [...e.target.files].forEach(f=>newShots.push({file:f,url:URL.createObjectURL(f)}));
+  e.target.value=""; renderPreviews();
+});
+$("#shotPrev").addEventListener("click",e=>{
+  const b=e.target.closest(".x"); if(!b) return;
+  if(b.dataset.k!==undefined){ removedShots.push(keptShots.splice(+b.dataset.k,1)[0]); }
+  else newShots.splice(+b.dataset.n,1);
+  renderPreviews();
+});
+$("#file").addEventListener("change",e=>{
+  const f=e.target.files[0]; if(f) $("#size").value=fmtSize(f.size);
+});
+function fmtSize(b){ return b>=1048576 ? (b/1048576).toFixed(b>=10485760?0:1)+" MB" : Math.max(1,Math.round(b/1024))+" KB"; }
+
+/* ---------- স্টোরেজ ---------- */
+async function up(path,blobOrFile,type){
+  const {error}=await sb.storage.from(BUCKET).upload(path,blobOrFile,{contentType:type||blobOrFile.type||"application/octet-stream",cacheControl:"31536000",upsert:true});
+  if(error) throw error;
+  return sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+}
+const pathOf = u => { const m=String(u||"").split("/"+BUCKET+"/")[1]; return m?decodeURIComponent(m.split("?")[0]):null; };
+async function removeUrls(urls){
+  const paths=urls.map(pathOf).filter(Boolean);
+  if(paths.length) await sb.storage.from(BUCKET).remove(paths);
+}
+
+/* ---------- সেভ ---------- */
+$("#appForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const st=$("#status"), btn=$("#save");
+  const name=$("#name").value.trim();
+  const file=$("#file").files[0], link=$("#link").value.trim();
+  if(!name){ showStatus(st,"err","অ্যাপের নাম লিখুন।"); return; }
+  if(!editing && !newIcon){ showStatus(st,"err","অ্যাপের আইকন বাছাই করুন।"); return; }
+  if(!editing && !file && !link){ showStatus(st,"err","সফটওয়্যার ফাইল দিন অথবা ডাউনলোড লিংক লিখুন।"); return; }
+  if(file && file.size>50*1024*1024){ showStatus(st,"err","ফাইল ৫০ MB এর বেশি। ফাইলটি অন্য কোথাও রেখে লিংক দিন।"); return; }
+
+  btn.disabled=true;
+  try{
+    const id = editing ? editing.id : crypto.randomUUID();
+    const t = Date.now();
+    const trash=[];
+    let icon_url = editing?editing.icon_url:"";
+    let file_url = editing?editing.file_url:"";
+    let size = $("#size").value.trim();
+
+    if(newIcon){
+      showStatus(st,"info","আইকন আপলোড হচ্ছে…");
+      const blob=await processImage(newIcon.file,{max:512,square:true,mime:"image/png"});
+      const nu=await up(`${id}/icon-${t}.png`,blob,"image/png");
+      if(editing&&editing.icon_url) trash.push(editing.icon_url);
+      icon_url=nu;
+    }
+
+    const shots=[...keptShots];
+    for(let i=0;i<newShots.length;i++){
+      showStatus(st,"info",`স্ক্রিনশট আপলোড হচ্ছে… (${i+1}/${newShots.length})`);
+      const blob=await processImage(newShots[i].file,{max:1400,mime:"image/jpeg",q:.86});
+      shots.push(await up(`${id}/shot-${t}-${i}.jpg`,blob,"image/jpeg"));
+    }
+    trash.push(...removedShots);
+
+    if(file){
+      showStatus(st,"info","সফটওয়্যার ফাইল আপলোড হচ্ছে… ফাইল বড় হলে একটু সময় লাগবে, পেজ বন্ধ করবেন না।");
+      const ext=(file.name.split(".").pop()||"bin").toLowerCase().replace(/[^a-z0-9]/g,"");
+      const nu=await up(`${id}/app-${t}.${ext}`,file,ext==="apk"?"application/vnd.android.package-archive":file.type);
+      if(editing&&editing.file_url) trash.push(editing.file_url);
+      file_url=nu; size=fmtSize(file.size);
+    } else if(link){
+      if(editing&&editing.file_url&&editing.file_url!==link) trash.push(editing.file_url);
+      file_url=link;
+    }
+
+    const row={
+      name, developer:$("#dev").value.trim(), category:$("#cat").value.trim()||"অন্যান্য",
+      description:$("#desc").value.trim(), version:$("#ver").value.trim(),
+      rating:Math.min(5,Math.max(1,parseFloat($("#rat").value)||4.5)),
+      size, icon_url, screenshots:shots, file_url, published:$("#pub").checked
+    };
+    showStatus(st,"info","সেভ হচ্ছে…");
+    const q = editing ? sb.from("apps").update(row).eq("id",id) : sb.from("apps").insert({id,...row});
+    const {error}=await q; if(error) throw error;
+    await removeUrls(trash);
+
+    showStatus(st,"ok", editing?"আপডেট হয়ে গেছে। স্টোরে এখনই দেখা যাবে।":"অ্যাপ প্রকাশ হয়েছে। স্টোরে এখনই দেখা যাবে।");
+    resetForm(false); loadList();
+  }catch(err){
+    console.error(err);
+    showStatus(st,"err","সমস্যা হয়েছে: "+(err.message||err));
+  }finally{ btn.disabled=false; }
+});
+
+function resetForm(clearStatus=true){
+  editing=null; keptShots=[]; removedShots=[]; newShots=[]; newIcon=null;
+  $("#appForm").reset(); $("#rat").value="4.5"; $("#pub").checked=true;
+  $("#formTitle").textContent="নতুন অ্যাপ যোগ করুন"; $("#save").textContent="প্রকাশ করুন";
+  $("#cancel").classList.add("hide"); renderPreviews();
+  if(clearStatus) hideStatus($("#status"));
+}
+$("#cancel").addEventListener("click",()=>resetForm());
+
+/* ---------- তালিকা, এডিট, মোছা ---------- */
+let apps=[];
+async function loadList(){
+  const {data,error}=await sb.from("apps").select("*").order("created_at",{ascending:false});
+  const box=$("#list");
+  if(error){ box.innerHTML=`<p style="color:var(--danger)">তালিকা লোড হয়নি: ${esc(error.message)}</p>`; return; }
+  apps=data;
+  $("#cats").innerHTML=[...new Set(apps.map(a=>a.category))].map(c=>`<option value="${esc(c)}">`).join("");
+  box.innerHTML = apps.length ? apps.map(a=>`
+    <div class="item">
+      ${a.icon_url?`<img src="${esc(a.icon_url)}" alt="">`:`<div class="ph"></div>`}
+      <div class="grow"><div class="t">${esc(a.name)}${a.published?"":" (লুকানো)"}</div>
+        <div class="m">${esc(a.category)} · ${esc(a.size)} · ${a.downloads} ডাউনলোড</div></div>
+      <div class="acts"><button class="sm" data-edit="${a.id}">এডিট</button><button class="sm del" data-del="${a.id}">মুছুন</button></div>
+    </div>`).join("") : `<p style="color:var(--soft)">এখনও কোনো অ্যাপ নেই। উপরের ফর্ম দিয়ে প্রথম অ্যাপ যোগ করুন।</p>`;
+}
+$("#list").addEventListener("click",async e=>{
+  const ed=e.target.closest("[data-edit]"), dl=e.target.closest("[data-del]");
+  if(ed){
+    const a=apps.find(x=>x.id===ed.dataset.edit); if(!a) return;
+    resetForm(); editing=a; keptShots=[...(a.screenshots||[])];
+    $("#name").value=a.name; $("#dev").value=a.developer; $("#cat").value=a.category;
+    $("#desc").value=a.description; $("#ver").value=a.version; $("#rat").value=a.rating;
+    $("#size").value=a.size; $("#pub").checked=a.published;
+    $("#link").value = pathOf(a.file_url)?"":a.file_url;
+    $("#formTitle").textContent="এডিট: "+a.name; $("#save").textContent="আপডেট করুন";
+    $("#cancel").classList.remove("hide"); renderPreviews();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+  if(dl){
+    const a=apps.find(x=>x.id===dl.dataset.del); if(!a) return;
+    if(!confirm(`"${a.name}" মুছে ফেলবেন? এটা ফেরানো যাবে না।`)) return;
+    await removeUrls([a.icon_url,a.file_url,...(a.screenshots||[])]);
+    const {error}=await sb.from("apps").delete().eq("id",a.id);
+    if(error) alert("মোছা যায়নি: "+error.message);
+    if(editing&&editing.id===a.id) resetForm();
+    loadList();
+  }
+});
+
+init();
+</script>
+</body>
+</html>
